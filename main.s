@@ -91,7 +91,10 @@ Start
       CPSIE  I    ; TExaS logic analyzer runs on interrupts
       MOV  R5,#0  ; last PA4
 loop  
-	 
+	 ; LDR  R0,=GPIO_PORTF_DATA_R
+	  ;LDR  R1, [R0]
+	  ;EOR  R1, #0x04
+	  ;STR  R1, [R0]
       LDR  R1,=GPIO_PORTA_DATA_R
       LDR  R4,[R1]  ;current value of switch
       AND  R4,R4,#0x10 ; select just bit 4
@@ -185,12 +188,8 @@ Wait
       
 Debug_Init 
       PUSH {R0-R4,LR}
-		LDR  R0,=GPIO_PORTF_DATA_R
-		LDR  R1, [R0]
-		EOR  R1, #0x04
-		STR  R1, [R0]
-		LDR  R0, =5000000
-		BL 	 Wait 
+		
+		
 ; you write this
 		LDR R0, =DataBuffer
 		MOV R1, #0
@@ -199,7 +198,7 @@ LOOP	LDRB R2, [R0, R1]
 		STRB R2, [R0, R1]
 		ADD R1, #1
 		CMP R1, #99
-		BNE LOOP
+		BLE LOOP
 		LDR R0, =TimeBuffer
 		MOV R1, #0
 		MOV R3, #399
@@ -208,7 +207,7 @@ LOOP2	LDR R2, [R0, R1]
 		STR R2, [R0, R1]
 		ADD R1, #4
 		CMP R1, R3
-		BLT LOOP2
+		BLE LOOP2
 		
 	; initialize pointers
 		LDR R0, =DataPt
@@ -237,11 +236,13 @@ LOOP2	LDR R2, [R0, R1]
 Debug_Capture 		
       PUSH {R0-R6,LR}
 ; you write this
+		
 		; Check if buffers are full
 		LDR R0, =DataPt
+		LDR R2, [R0]
 		LDR R1, =DataBuffer
 		ADD R1, #100
-		CMP R1, R0
+		CMP R1, R2
 		BEQ Exit
 		
 		LDR R0, =GPIO_PORTA_DATA_R		;read ports A and E
@@ -261,21 +262,20 @@ Debug_Capture
 		
 		; Read the Timer
 		LDR R5, =NVIC_ST_CURRENT_R
-		LDR R6, [R5]
+		LDR R6, [R5]                         ;get the current value of timer
 		LDR R1, =TimePt
-		LDR R2, [R1]
-		LDR R3, [R2]
+		LDR R2, [R1]				; R2 has the address of next free buffer space
+		LDR R3, [R2]				
 		SUB R0, R3, R6			
 		AND R0, #0x00FFFFFF
 		STR R0, [R2]
-		LDR R4, =TimePt
 		LDR R5, =TimeBuffer
 		ADD R5, #399
-		CMP R4, R5
-		BEQ Exit						;check if it reached the end 
+		CMP R2, R5
+		BHI Exit						;check if it reached the end 
 		ADD R2, #4
 		STR R6, [R2]			;store current timer val in next array loc
-		STR R2, [R1]
+		STR R2, [R1]			;update time ptr
 		
 		
 Exit   POP  {R0-R6,PC}

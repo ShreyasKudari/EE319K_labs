@@ -91,10 +91,10 @@ Start
       CPSIE  I    ; TExaS logic analyzer runs on interrupts
       MOV  R5,#0  ; last PA4
 loop  
-	 ; LDR  R0,=GPIO_PORTF_DATA_R
-	  ;LDR  R1, [R0]
-	  ;EOR  R1, #0x04
-	  ;STR  R1, [R0]
+	 LDR  R0,=GPIO_PORTF_DATA_R
+	  LDR  R1, [R0]
+	  EOR  R1, #0x04
+	  STR  R1, [R0]
       LDR  R1,=GPIO_PORTA_DATA_R
       LDR  R4,[R1]  ;current value of switch
       AND  R4,R4,#0x10 ; select just bit 4
@@ -183,7 +183,7 @@ Stepper_Step
 ; inaccurate and inefficient time delay
 Wait 
       SUBS R0,R0,#1  ; outer loop
-      BNE  Wait
+       BNE  Wait
       BX   LR
       
 Debug_Init 
@@ -236,29 +236,25 @@ LOOP2	LDR R2, [R0, R1]
 Debug_Capture 		
       PUSH {R0-R6,LR}
 ; you write this
-		
-		; Check if buffers are full
-		LDR R0, =DataPt
-		LDR R2, [R0]
+		LDR R4, =DataPt    					; Check if buffer is full
+		LDR R6, [R4]
 		LDR R1, =DataBuffer
 		ADD R1, #100
-		CMP R1, R2
+		CMP R1, R6
 		BEQ Exit
-		
 		LDR R0, =GPIO_PORTA_DATA_R		;read ports A and E
 		LDR R1, =GPIO_PORTE_DATA_R
 		
 		LDRB R2, [R0]
 		LDRB R3, [R1]
-		AND R4, R3, #0x0F
-		AND R5, R2, #0x10
-		ORR R4, R5			;R4 contains the 8 bit dump value 
+		AND R3, R3, #0x0F
+		AND R2, R2, #0x10
+		ORR R3, R2			;R4 contains the 8 bit dump value 
 		
-		LDR R0, =DataPt
-		LDR R1, [R0]
-		STRB R4, [R1]
-		ADD R1, #1
-		STR R1, [R0]
+		
+		STRB R3, [R6]
+		ADD R6, #1
+		STR R6, [R4]
 		
 		; Read the Timer
 		LDR R5, =NVIC_ST_CURRENT_R
@@ -266,11 +262,11 @@ Debug_Capture
 		LDR R1, =TimePt
 		LDR R2, [R1]				; R2 has the address of next free buffer space
 		LDR R3, [R2]				
-		SUB R0, R3, R6			
-		AND R0, #0x00FFFFFF
-		STR R0, [R2]
+		SUB R3, R6			
+		AND R3, #0x00FFFFFF
+		STR R3, [R2]
 		LDR R5, =TimeBuffer
-		ADD R5, #399
+		ADD R5, #395
 		CMP R2, R5
 		BHI Exit						;check if it reached the end 
 		ADD R2, #4

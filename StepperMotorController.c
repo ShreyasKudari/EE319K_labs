@@ -1,8 +1,8 @@
 // StepperMotorController.c starter file EE319K Lab 5
 // Runs on TM4C123
 // Finite state machine to operate a stepper motor.  
-// Jonathan Valvano
-// January 18, 2019
+// Shreyas Kudari/Rakesh Johny
+// March 12, 2019
 
 // Hardware connections (External: two input buttons and four outputs to stepper motor)
 //  PA5 is Wash input  (1 means pressed, 0 means not pressed)
@@ -23,55 +23,91 @@ void EnableInterrupts(void);
 #define PA4       (*((volatile unsigned long *)0x40004040))
 #define PE50      (*((volatile unsigned long *)0x400240FC))
 #define HOME			&FSM[0]
-#define	WIPE1			&FSM[2]
-#define WIPE2			&FSM[4]
+#define	Wash1			&FSM[1]
+#define Wipe2			&FSM[2]
+#define Wash3			&FSM[3]
+#define Wipe4			&FSM[4]
+#define Wash5			&FSM[5]
+#define Wipe6			&FSM[6]
+#define Wash7			&FSM[7]
+#define Wipe8			&FSM[8]
+#define Wash9			&FSM[9]
+#define Wipe10			&FSM[10]
+#define Wash11			&FSM[11]
+#define Wipe12			&FSM[12]
+#define Wash13			&FSM[13]
+#define Wipe14			&FSM[14]
+#define Wash15			&FSM[15]
+#define Wipe16			&FSM[16]
+#define Wash17			&FSM[17]
+#define Wipe18			&FSM[18]
+#define Wash19			&FSM[19]
+#define Wipe20			&FSM[20]
+#define Wash21			&FSM[21]
+#define Wipe22			&FSM[22]
+#define Wash23			&FSM[23]
+#define Wipe24  		&FSM[24]
+#define Wash25			&FSM[25]
+#define Wipe26			&FSM[26]
+#define Wash27			&FSM[27]
+#define Wipe28			&FSM[28]
+#define Wash29			&FSM[29]
+#define Wipe30			&FSM[30]
+#define Wash31    	&FSM[31]
+#define Wipe32			&FSM[32]
+#define Wash33			&FSM[33]
+#define Wipe34			&FSM[34]
+#define Wash35			&FSM[35]
+#define T20ms					20
+
+
 
 void SendDataToLogicAnalyzer(void){
   UART0_DR_R = 0x80|(PA4<<2)|PE50;
 }
 	struct State{
-		uint32_t output[2];
+		uint32_t output;
 		uint32_t wait;
 		const struct State *Next[4];
 	};
 	typedef const struct State STyp;
 	STyp FSM[36] = {
-		{{0x01,0}, 10, {&FSM[0], &FSM[2], &FSM[3], &FSM[3]}},
-		{{0x01,1}, 10, {&FSM[2], &FSM[2], &FSM[3], &FSM[3]}},
-		{{0x02,0}, 10, {&FSM[4], &FSM[4], &FSM[5], &FSM[5]}},
-		{{0x02,1}, 10, {&FSM[4], &FSM[4], &FSM[5], &FSM[5]}},
-		{{0x04,0}, 10, {&FSM[6], &FSM[6], &FSM[7], &FSM[7]}},
-		{{0x04,1}, 10, {&FSM[6], &FSM[6], &FSM[7], &FSM[7]}},
-		{{0x08,0}, 10, {&FSM[8], &FSM[8], &FSM[9], &FSM[9]}},
-		{{0x08,1}, 10, {&FSM[8], &FSM[8], &FSM[9], &FSM[9]}},
-		{{0x010,0}, 10, {&FSM[10], &FSM[10], &FSM[11], &FSM[11]}},
-		{{0x010,1}, 10, {&FSM[10], &FSM[10], &FSM[11], &FSM[11]}},
-		{{0x01,0}, 10, {&FSM[12], &FSM[12], &FSM[13], &FSM[13]}},
-		{{0x01,1}, 10, {&FSM[12], &FSM[12], &FSM[13], &FSM[13]}},
-		{{0x02,0}, 10, {&FSM[14], &FSM[14], &FSM[15], &FSM[15]}},
-		{{0x02,1}, 10, {&FSM[14], &FSM[14], &FSM[15], &FSM[15]}},
-		{{0x04,0}, 10, {&FSM[16], &FSM[16], &FSM[17], &FSM[17]}},
-		{{0x04,1}, 10, {&FSM[16], &FSM[16], &FSM[17], &FSM[17]}},
-		{{0x08,0}, 10, {&FSM[18], &FSM[18], &FSM[19], &FSM[19]}},
-		{{0x08,1}, 10, {&FSM[18], &FSM[18], &FSM[19], &FSM[19]}},
-		{{0x010,0}, 10, {&FSM[20], &FSM[20], &FSM[21], &FSM[21]}},
-		{{0x010,1}, 10, {&FSM[20], &FSM[20], &FSM[21], &FSM[21]}},
-		{{0x08,0}, 10, {&FSM[22], &FSM[22], &FSM[23], &FSM[23]}},
-		{{0x08,1}, 10, {&FSM[22], &FSM[22], &FSM[23], &FSM[23]}},
-		{{0x04,0}, 10, {&FSM[24], &FSM[24], &FSM[25], &FSM[25]}},
-		{{0x04,1}, 10, {&FSM[24], &FSM[24], &FSM[25], &FSM[25]}},
-		{{0x02,0}, 10, {&FSM[26], &FSM[26], &FSM[27], &FSM[27]}},
-		{{0x02,1}, 10, {&FSM[26], &FSM[26], &FSM[27], &FSM[27]}},
-		{{0x01,0}, 10, {&FSM[28], &FSM[28], &FSM[29], &FSM[29]}},
-		{{0x01,1}, 10, {&FSM[28], &FSM[28], &FSM[29], &FSM[29]}},
-		{{0x010,0}, 10, {&FSM[30], &FSM[20], &FSM[31], &FSM[31]}},
-		{{0x010,1}, 10, {&FSM[30], &FSM[20], &FSM[31], &FSM[31]}},
-		{{0x08,0}, 10, {&FSM[32], &FSM[32], &FSM[33], &FSM[33]}},
-		{{0x08,1}, 10, {&FSM[32], &FSM[32], &FSM[33], &FSM[33]}},
-		{{0x04,0}, 10, {&FSM[34], &FSM[34], &FSM[35], &FSM[35]}},
-		{{0x04,1}, 10, {&FSM[34], &FSM[34], &FSM[35], &FSM[35]}},
-		{{0x02,0}, 10, {&FSM[0], &FSM[0], &FSM[1], &FSM[1]}},
-		{{0x02,1}, 10, {&FSM[0], &FSM[0], &FSM[1], &FSM[1]}},
+		{0x01, T20ms, {HOME, Wipe2, Wash3, Wash3}},
+		{0x21, T20ms, {Wipe2, Wipe2, Wash3, Wash3}},
+		{0x02, T20ms, {Wipe4, Wipe4, Wash5, Wash5}},
+		{0x02, T20ms, {Wipe4, Wipe4, Wash5, Wash5}},
+		{0x04, T20ms, {Wipe6, Wipe6, Wash7, Wash7}},
+		{0x24, T20ms, {Wipe6, Wipe6, Wash7, Wash7}},
+		{0x08, T20ms, {Wipe8, Wipe8, Wash9, Wash9}},
+		{0x08, T20ms, {Wipe8, Wipe8, Wash9, Wash9}},
+		{0x010,T20ms, {Wipe10, Wipe10, Wash11, Wash11}},
+		{0x030,T20ms, {Wipe10, Wipe10, Wash11, Wash11}},
+		{0x01, T20ms, {Wipe12, Wipe12, Wash13, Wash13}},
+		{0x01, T20ms, {Wipe12, Wipe12, Wash13, Wash13}},
+		{0x02, T20ms, {Wipe14, Wipe14, Wash15, Wash15}},
+		{0x22, T20ms, {Wipe14, Wipe14, Wash15, Wash15}},
+		{0x04, T20ms, {Wipe16, Wipe16, Wash17, Wash17}},
+		{0x04, T20ms, {Wipe16, Wipe16, Wash17, Wash17}},
+		{0x08,T20ms, {Wipe18, Wipe18, Wash19, Wash19}},
+		{0x28, T20ms, {Wipe18, Wipe18, Wash19, Wash19}},
+		{0x010,T20ms, {Wipe20, Wipe20, Wash21, Wash21}},
+		{0x010,T20ms, {Wipe20, Wipe20, Wash21, Wash21}},
+		{0x08, T20ms, {Wipe22, Wipe22, Wash23, Wash23}},
+		{0x28, T20ms, {Wipe22, Wipe22, Wash23, Wash23}},
+		{0x04, T20ms, {Wipe24, Wipe24, Wash25, Wash25}},
+		{0x04,T20ms, {Wipe24, Wipe24, Wash25, Wash25}},
+		{0x02, T20ms, {Wipe26, Wipe26, Wash27, Wash27}},
+		{0x22, T20ms, {Wipe26, Wipe26, Wash27, Wash27}},
+		{0x01, T20ms, {Wipe28, Wipe28, Wash29, Wash29}},
+		{0x01,T20ms, {Wipe28, Wipe28, Wash29, Wash29}},
+		{0x010,T20ms, {Wipe30, Wipe30, Wash31, Wash31}},
+		{0x030,T20ms, {Wipe30, Wipe30, Wash31, Wash31}},
+		{0x08, T20ms, {Wipe32, Wipe32, Wash33, Wash33}},
+		{0x08, T20ms, {Wipe32, Wipe32, Wash33, Wash33}},
+		{0x04, T20ms, {Wipe34, Wipe34, Wash35, Wash35}},
+		{0x24, T20ms, {Wipe34, Wipe34, Wash35, Wash35}},
+		{0x02, T20ms, {HOME, HOME, Wash1, Wash1}},
+		{0x02, T20ms, {HOME, HOME, Wash1, Wash1}},
 	};
 		int volatile t = 1;
 
@@ -93,12 +129,10 @@ SYSCTL_RCGCGPIO_R |= 0x011;
   while(1){
 		
 // output
-		GPIO_PORTE_DATA_R = Pt->output[0];
+		GPIO_PORTE_DATA_R = Pt->output;
 // wait
  				SysTick_Wait10ms(Pt->wait);
-				GPIO_PORTE_DATA_R ^= (Pt->output[1] << 5);			// toggles LED
-				//GPIO_PORTE_DATA_R = GPIO_PORTE_DATA_R;
-				SysTick_Wait10ms(Pt->wait);
+				
 // input
 		input = GPIO_PORTA_DATA_R >> 2;
 		

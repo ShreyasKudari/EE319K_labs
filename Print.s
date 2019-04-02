@@ -24,10 +24,24 @@
 ; Input: R0 (call by value) 32-bit unsigned number
 ; Output: none
 ; Invariables: This function must not permanently modify registers R4 to R11
-LCD_OutDec
-
-
-      BX  LR
+LCD_OutDec	PUSH {R0,LR}
+	 CMP R0, #10
+	 BGT rec
+	 ADD R0, '0'
+	 ST7735_OutChar(R0)
+	 POP{R0,LR}
+	 BX LR
+rec	 UDIV R0,#10
+	 BL LCD_OutDec
+	 UDIV R1, R0, #10
+	 MUL R1,#10
+	 SUB R1, R0, R1
+     ADD R1,'0'
+	 MOV R0,R1
+	 ST7735_OutChar(R0)
+	 POP{R0,LR}
+	 BX LR
+	
 ;* * * * * * * * End of LCD_OutDec * * * * * * * *
 
 ; -----------------------LCD _OutFix----------------------
@@ -43,11 +57,41 @@ LCD_OutDec
 ;       R0>9999, then output "*.*** "
 ; Invariables: This function must not permanently modify registers R4 to R11
 LCD_OutFix
-
-     BX   LR
+	 CMP R0, #9999
+	 BGT stars
+	 MOV R1,R0
+	 UDIV R0,R0,#1000
+	 ADD R0,'0'
+	 ST7735_OutChar(R0)
+	 MOV R0, '.'
+	 ST7735_OutChar(R0)
+	 MOV R0,R1
+	 UDIV R0,R0,#100
+	 ADD R0,'0'
+	 ST7735_OutChar(R0)
+	 MOV R0,R1
+	 UDIV R0,R0,#10
+	 ADD R0,'0'
+	 ST7735_OutChar(R0)
+	 MOV R0,R1
+	 ADD R0,'0'
+	 ST7735_OutChar(R0) 
+	 BL done
+stars MOV R0,'*'
+	ST7735_OutChar(R0) 
+	MOV R0, '.'
+	 ST7735_OutChar(R0)
+	 MOV R0,'*'
+	ST7735_OutChar(R0)
+	MOV R0,'*'
+	ST7735_OutChar(R0)
+	MOV R0,'*'
+	ST7735_OutChar(R0)
+done     BX   LR
  
      ALIGN
 ;* * * * * * * * End of LCD_OutFix * * * * * * * *
 
      ALIGN                           ; make sure the end of this section is aligned
      END                             ; end of file
+

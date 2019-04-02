@@ -59,15 +59,27 @@ SSI_SR_TNF              EQU   0x00000002  ; SSI Transmit FIFO Not Full
 ; Assumes: SSI0 and port A have already been initialized and enabled
 writecommand
 ;; --UUU-- Code to write a command to the LCD
-;1) Read SSI0_SR_R and check bit 4, 
+step1 LDR R4,= SSIO_SR_R
+	;1) Read SSI0_SR_R and check bit 4,
+	LDR [R5], R0
+	ORR R5, R5, #0x010
+	LSR R5,R5,#4
+	CMP R5,R5,#1
+	BEQ step1
 ;2) If bit 4 is high, loop back to step 1 (wait for BUSY bit to be low)
+	
 ;3) Clear D/C=PA6 to zero
+	AND DC,#0
 ;4) Write the command to SSI0_DR_R
+	SSIO_DR_R = DC_COMMAND
 ;5) Read SSI0_SR_R and check bit 4, 
-;6) If bit 4 is high, loop back to step 5 (wait for BUSY bit to be low)
-
-    
-    
+step5 LDR R4,= SSIO_SR_R
+	LDR [R5], R0
+	ORR R5, R5, #0x010
+	LSR R5,R5,#4
+	CMP R5,R5,#1
+	BEQ step5
+;6) If bit 4 is high, loop back to step 5 (wait for BUSY bit to be low)  
     BX  LR                          ;   return
 
 ; This is a helper function that sends an 8-bit data to the LCD.
@@ -77,12 +89,17 @@ writecommand
 writedata
 ;; --UUU-- Code to write data to the LCD
 ;1) Read SSI0_SR_R and check bit 1, 
+step1 LDR R4,= SSIO_SR_R
+	LDR [R5], R0
+	ORR R5, R5, #0x01
+	LSR R5,R5,#1
+	CMP R5,R5,#0
+	BEQ step1	
 ;2) If bit 1 is low loop back to step 1 (wait for TNF bit to be high)
+	DC = #1
 ;3) Set D/C=PA6 to one
-;4) Write the 8-bit data to SSI0_DR_R
-
-    
-    
+	SSIO_DR_R = DC_DATA
+;4) Write the 8-bit data to SSI0_DR_R 
     BX  LR                          ;   return
 
 

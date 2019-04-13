@@ -24,6 +24,27 @@
 LCD_OutDec PROC
     EXPORT   LCD_OutDec
 ;put your Lab 7 solution here
+n 	EQU 0
+		CMP R0, #10
+		BLO Base
+		PUSH {R0, LR}  
+		MOV R2, #10
+		UDIV R0, R2
+		BL LCD_OutDec
+		LDR R0, [SP,#n]
+		MOV R2, #10
+		UDIV R1, R0, R2
+		MUL	 R1, R2
+		SUB  R0, R1
+		STR R0, [SP,#n]
+		ADD R0, #0x30
+		BL ST7735_OutChar
+		POP	{R0, PC}
+	
+Base	PUSH {R0, LR}
+		ADD R0, #0x30
+		BL ST7735_OutChar
+		POP {R0, PC}
     BX LR
     ENDP
 ;* * * * * * * * End of LCD_OutDec * * * * * * * *
@@ -43,7 +64,66 @@ LCD_OutDec PROC
 LCD_OutFix PROC
          EXPORT   LCD_OutFix
 ;put your Lab 7 solution here
-         BX LR
+VAL 	EQU 0
+		PUSH {R0, LR}	
+		SUB SP, #8
+		
+		MOV R1, #9999
+		CMP R0, R1
+		BHI stars
+		STR R0, [SP,#VAL]
+		
+		MOV R2, #1000
+		LDR R3, [SP, #VAL]
+		UDIV R1,R3,R2
+		ADD R0, R1, #0x30
+		MUL R1, R2
+		SUB R3, R1
+		STR R3, [SP, #VAL]
+		BL ST7735_OutChar
+		
+		
+		MOV R0, #0x2E
+		BL ST7735_OutChar
+		
+		MOV R2, #100
+		LDR R3, [SP, #VAL]
+		UDIV R1,R3,R2
+		ADD R0, R1, #0x30
+		MUL R1, R2
+		SUB R3, R1
+		STR R3, [SP, #VAL]
+		BL ST7735_OutChar
+		
+		MOV R2, #10
+		LDR R3, [SP, #VAL]
+		UDIV R1,R3,R2
+		ADD R0, R1, #0x30
+		MUL R1, R2
+		SUB R3, R1
+		STR R3, [SP, #VAL]
+		BL ST7735_OutChar
+		
+		LDR R0, [SP, #VAL]
+		ADD R0,#0x30
+		BL ST7735_OutChar 
+		
+		B done
+		
+stars 	MOV R0,#0x2A
+		BL ST7735_OutChar 
+		MOV R0, #0x2E
+		BL ST7735_OutChar
+		MOV R0,#0x2A
+		BL ST7735_OutChar
+		MOV R0,#0x2A
+		BL ST7735_OutChar
+		MOV R0,#0x2A
+		BL ST7735_OutChar
+		
+done    ADD SP, #8
+		POP {R0, LR}
+		BX   LR
          ENDP
 
          ALIGN

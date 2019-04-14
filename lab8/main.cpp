@@ -77,7 +77,7 @@ int main1(void){      // single step this program and look at Data
   }
 }
 
-int main(void){
+int main2(void){
   DisableInterrupts();
   TExaS_Init();       // Bus clock is 80 MHz 
   ADC_Init();        // turn on ADC, PD2, set channel to 5
@@ -122,7 +122,7 @@ int main3(void){
 
 
 // final main program to create distance meter
-int mainreal(void){ 
+int main(void){ 
     //*** students write this ******
 
   DisableInterrupts();
@@ -133,9 +133,21 @@ int mainreal(void){
 
   // more initializations
   EnableInterrupts();
+	SysTick_Init(1333333);		//80M/60
+
 
   while(1){
+		
     Sensor.Sync(); // wait for semaphore
+		ST7735_SetCursor(0,0);
+		Position=Sensor.Distance();
+		LCD_OutFix(Position);
+		ST7735_SetCursor(6,0);
+		ST7735_OutChar(67);
+		ST7735_OutChar(77);
+		
+
+		
     // can call Sensor.ADCsample, Sensor.Distance, Sensor.Convert as needed 
       
   }
@@ -143,5 +155,9 @@ int mainreal(void){
 void SysTick_Handler(void){ // every 16.67 ms
     //*** students write this ******
 // should call ADC_In() and my.Save
-  Sensor.Save(ADC_In());
+	PF1^=0x02;
+	PF1^=0x02;
+	uint32_t data=ADC_In();
+  Sensor.Save(data);
+	PF1^=0x02;
 }

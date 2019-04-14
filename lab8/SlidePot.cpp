@@ -70,7 +70,9 @@ void SlidePot::Save(uint32_t n){
 // 1) save ADC sample into private variable
 // 2) calculate distance from ADC, save into private variable
 // 3) set semaphore flag = 1
-	
+	data=n;
+	distance=Convert(n);
+	flag=1;
 	
 	
 	
@@ -78,24 +80,28 @@ void SlidePot::Save(uint32_t n){
 uint32_t SlidePot::Convert(uint32_t n){
   //*** students write this ******
   // use calibration data to convert ADC sample to distance
-  return 0; // replace this with solution
+	
+  return (1556*n)/4096+311;; // replace this with solution
 }
 
 void SlidePot::Sync(void){
 // 1) wait for semaphore flag to be nonzero
 // 2) set semaphore flag to 0
+	while(flag==0)
+	{}
+		flag=0;
 }
 
 uint32_t SlidePot::ADCsample(void){ // return ADC sample value (0 to 4095)
   //*** students write this ******
   // return last calculated ADC sample
-  return 0; // replace this with solution
+  return data; // replace this with solution
 }
 
 uint32_t SlidePot::Distance(void){  // return distance value (0 to 2000), 0.001cm
   //*** students write this ******
   // return last calculated distance in 0.001cm
-  return 0; // replace this with solution
+  return distance; // replace this with solution
 }
 
 

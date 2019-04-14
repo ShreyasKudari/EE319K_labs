@@ -1,6 +1,6 @@
 // Lab8.cpp
 // Runs on LM4F120 or TM4C123
-// Student names: Shreyas Kudari and Rakesh Johny
+// Student names: Shreyas Kudari and Rakesh Johny 
 // Last modification date: change this to the last modification date or look very silly
 // Last Modified: 3/28/2018 
 
@@ -41,8 +41,7 @@ extern "C" void SysTick_Handler(void);
 //        Minimum is determined by length of ISR
 // Output: none
 void SysTick_Init(unsigned long period){
-  //*** students write this ******
-	NVIC_ST_CTRL_R=0;
+  NVIC_ST_CTRL_R=0;
 	NVIC_ST_CURRENT_R=0;
 	NVIC_ST_RELOAD_R=period;
 	NVIC_SYS_PRI3_R=(NVIC_SYS_PRI3_R&0x00FFFFFF)|0x40000000;
@@ -53,17 +52,18 @@ void SysTick_Init(unsigned long period){
 void PortF_Init(void){
   //*** students write this ******
 	volatile uint32_t delay;
-	SYSCTL_RCGCGPIO_R|=0x10;
+	SYSCTL_RCGCGPIO_R|=0x20;
 	delay++;
 	delay++;
 	GPIO_PORTF_LOCK_R=GPIO_LOCK_KEY;
 	GPIO_PORTF_CR_R |=0x0E;				//enable commit for PF1, PF2 and PF3
-	GPIO_PORTF_AMSEL_R &= 0xF1;	//disable analog functionality on PF1, PF2 and PF
-	GPIO_PORTF_PCTL_R = (GPIO_PORTF_PCTL_R&0xFFFF000F)+0x00000000;//configure PF0 and PF4 as GPIO
-	GPIO_PORTF_AFSEL_R &= 0xF1;	//disable alt funct on PF0 and PF4
-	GPIO_PORTF_DIR_R&=0xF1;		
+	GPIO_PORTF_AMSEL_R &= ~0x0E;	//disable analog functionality on PF1, PF2 and PF
+	//GPIO_PORTF_PCTL_R = (GPIO_PORTF_PCTL_R&0xFFFF000F)+0x00000000;//configure PF0 and PF4 as GPIO
+	GPIO_PORTF_AFSEL_R &= ~0x0E;	//disable alt funct on PF0 and PF4
+	GPIO_PORTF_DIR_R|=0x0E;		
 	GPIO_PORTF_DEN_R|=0x0E;
-	GPIO_PORTF_PUR_R=0x0E;			
+	//GPIO_PORTF_PUR_R=0x0E;	
+
 }
 uint32_t Data;      // 12-bit ADC
 uint32_t Position;  // 32-bit fixed-point 0.001 cm
@@ -77,7 +77,7 @@ int main1(void){      // single step this program and look at Data
   }
 }
 
-int main2(void){
+int main(void){
   DisableInterrupts();
   TExaS_Init();       // Bus clock is 80 MHz 
   ADC_Init();        // turn on ADC, PD2, set channel to 5
@@ -89,7 +89,7 @@ int main2(void){
     Data = ADC_In();  // sample 12-bit channel 5, PD2
     PF2 = 0x00;       // end of ADC Profile
     ST7735_SetCursor(0,0);
-    PF1 = 0x02;       // Profile LCD
+   PF1 = 0x02;       // Profile LCD
     LCD_OutDec(Data); 
     ST7735_OutString("    ");  // these spaces are used to coverup characters from last output
     PF1 = 0;          // end of LCD Profile
@@ -122,7 +122,7 @@ int main3(void){
 
 
 // final main program to create distance meter
-int main(void){ 
+int mainreal(void){ 
     //*** students write this ******
 
   DisableInterrupts();
@@ -137,16 +137,11 @@ int main(void){
   while(1){
     Sensor.Sync(); // wait for semaphore
     // can call Sensor.ADCsample, Sensor.Distance, Sensor.Convert as needed 
-		uint32_t data = Sensor.Distance();
-		LCD_OutFix(data);						//outputs fixed point data to the LCD
-		ST7735_OutString("cms");		//prints out the unit
+      
   }
 }
 void SysTick_Handler(void){ // every 16.67 ms
     //*** students write this ******
 // should call ADC_In() and my.Save
-	PF1 ^= 0x01;				//togge LED1 for heartbeat
-	PF2 ^= 0x01;				//toggle LED2 for heartbeat
-	Sensor.Save(ADC_In());
-	PF3 ^= 0x01;				//toggle LED2 for heartbeat
+  Sensor.Save(ADC_In());
 }

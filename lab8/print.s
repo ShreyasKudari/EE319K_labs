@@ -24,7 +24,7 @@
 LCD_OutDec PROC
     EXPORT   LCD_OutDec
 ;put your Lab 7 solution here
-n 	EQU 0
+n EQU 0
 		CMP R0, #10
 		BLO Base
 		PUSH {R0, LR}  
@@ -45,6 +45,7 @@ Base	PUSH {R0, LR}
 		ADD R0, #0x30
 		BL ST7735_OutChar
 		POP {R0, PC}
+  
     BX LR
     ENDP
 ;* * * * * * * * End of LCD_OutDec * * * * * * * *
@@ -64,7 +65,7 @@ Base	PUSH {R0, LR}
 LCD_OutFix PROC
          EXPORT   LCD_OutFix
 ;put your Lab 7 solution here
-VAL 	EQU 0
+VAL EQU 0
 		PUSH {R0, LR}	
 		SUB SP, #8
 		
@@ -123,7 +124,7 @@ stars 	MOV R0,#0x2A
 		
 done    ADD SP, #8
 		POP {R0, LR}
-		BX   LR
+         BX LR
          ENDP
 
          ALIGN

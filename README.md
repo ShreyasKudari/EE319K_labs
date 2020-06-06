@@ -1,2 +1,2 @@
 # EE319K_labs
-Code sharing 
+Labs for the embedded systems class at UT Austin
